@@ -1,13 +1,31 @@
 import React from "react";
+import { Loading } from "./loading";
 
 class ClassState extends React.Component {
   state = {
     error: false,
+    loading: false,
   };
+
+  componentDidMount() {
+    console.log("✅ ClassState -> Mount");
+  }
+  componentDidUpdate() {
+    console.log("🔄️ ClassState -> Update");
+    if (this.state.loading) {
+      setTimeout(() => {
+        console.log("🔄️ ClassState -> Update -> Loading");
+        this.setState({ loading: false });
+      }, 3000);
+    }
+  }
+  componentWillUnmount() {
+    console.log("⛔ ClassState -> Unmount");
+  }
 
   render() {
     const { name } = this.props;
-    const { error } = this.state;
+    const { error, loading } = this.state;
 
     return (
       <div>
@@ -16,13 +34,18 @@ class ClassState extends React.Component {
 
         {error && (
           <p>
-            <b>Error:</b> Código de seguridad es incorrecto
+            🐞<b>Error:</b> Código de seguridad es incorrecto
           </p>
         )}
+        {loading && <Loading />}
 
         <input type="text" placeholder="Código de seguridad" />
+
         <button onClick={() => this.setState({ error: !error })}>
-          Comprobar
+          Toggle Error
+        </button>
+        <button onClick={() => this.setState({ loading: !loading })}>
+          Toggle Loading
         </button>
       </div>
     );
