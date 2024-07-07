@@ -1,14 +1,24 @@
 import React from "react";
 
+const SECURITY_CODE = "paradigma";
+
 function UseState({ name }) {
+  const [value, setValue] = React.useState("");
   const [error, setError] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (loading) {
       setTimeout(() => {
+        if (value === SECURITY_CODE) {
+          setError(false);
+          console.log("✅ Código correcto");
+        } else {
+          setError(true);
+          console.log("🐞 Código incorrecto");
+        }
         setLoading(false);
-      }, 3000);
+      }, 1000);
     }
   }, [loading]);
 
@@ -28,7 +38,12 @@ function UseState({ name }) {
         </p>
       )}
 
-      <input type="text" placeholder="Código de seguridad" />
+      <input
+        type="text"
+        placeholder="Código de seguridad"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
 
       <button onClick={() => setLoading(true)}>Comprobar</button>
     </div>
