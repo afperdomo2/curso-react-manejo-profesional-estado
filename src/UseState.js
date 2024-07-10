@@ -3,23 +3,19 @@ import React from "react";
 const SECURITY_CODE = "paradigma";
 
 function UseState({ name }) {
+  // Estado simple
+  const [value, setValue] = React.useState("");
+
   // Estado compuesto
   const [state, setState] = React.useState({
-    value: "",
     error: false,
     loading: false,
   });
 
-  console.log(state);
-
-  // const [value, setValue] = React.useState("");
-  // const [error, setError] = React.useState(false);
-  // const [loading, setLoading] = React.useState(false);
-
   React.useEffect(() => {
     if (state.loading) {
       setTimeout(() => {
-        if (state.value === SECURITY_CODE) {
+        if (this.value === SECURITY_CODE) {
           setState({ ...state, error: false });
         } else {
           setState({ ...state, error: true });
@@ -27,22 +23,8 @@ function UseState({ name }) {
         setState({ ...state, loading: false });
       }, 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.loading]);
-
-  // React.useEffect(() => {
-  //   if (loading) {
-  //     setTimeout(() => {
-  //       if (value === SECURITY_CODE) {
-  //         setError(false);
-  //         console.log("✅ Código correcto");
-  //       } else {
-  //         setError(true);
-  //         console.log("🐞 Código incorrecto");
-  //       }
-  //       setLoading(false);
-  //     }, 1000);
-  //   }
-  // }, [loading]);
 
   return (
     <div>
@@ -63,8 +45,8 @@ function UseState({ name }) {
       <input
         type="text"
         placeholder="Código de seguridad"
-        value={state.value}
-        onChange={(e) => setState({ ...state, value: e.target.value })}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
       />
 
       <button onClick={() => setState({ ...state, loading: true })}>
