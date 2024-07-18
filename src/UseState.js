@@ -14,13 +14,35 @@ function UseState({ name }) {
     confirmed: false, // estado imperativo para simular confirmación
   });
 
+  // Estado semi-declarativo
+  const onConfirm = () => {
+    setState({ ...state, error: false, loading: false, confirmed: true });
+  };
+
+  const onError = () => {
+    setState({ ...state, error: true, loading: false });
+  };
+
+  const onCheck = () => {
+    setState({ ...state, loading: true });
+  };
+
+  const onDelete = () => {
+    setState({ ...state, deleted: true });
+  };
+
+  const onReset = () => {
+    setState({ ...state, confirmed: false, deleted: false });
+    setValue("");
+  };
+
   React.useEffect(() => {
     if (state.loading) {
       setTimeout(() => {
         if (value === SECURITY_CODE) {
-          setState({ ...state, error: false, loading: false, confirmed: true });
+          onConfirm();
         } else {
-          setState({ ...state, error: true, loading: false });
+          onError();
         }
       }, 500);
     }
@@ -51,9 +73,7 @@ function UseState({ name }) {
           onChange={(e) => setValue(e.target.value)}
         />
 
-        <button onClick={() => setState({ ...state, loading: true })}>
-          Comprobar
-        </button>
+        <button onClick={() => onCheck()}>Comprobar</button>
       </div>
     );
   } else if (state.confirmed && !state.deleted) {
@@ -62,12 +82,8 @@ function UseState({ name }) {
         <h2>Eliminar {name}</h2>
         <p>¿Estás seguro que deseas eliminar el estado?</p>
         <div>
-          <button onClick={() => setState({ ...state, deleted: true })}>
-            Si, eliminar
-          </button>
-          <button onClick={() => setState({ ...state, confirmed: false })}>
-            Cancelar
-          </button>
+          <button onClick={() => onDelete()}>Si, eliminar</button>
+          <button onClick={() => onReset()}>Cancelar</button>
         </div>
       </div>
     );
@@ -75,13 +91,7 @@ function UseState({ name }) {
     return (
       <div>
         <h2>Estado eliminado correctamente</h2>
-        <button
-          onClick={() =>
-            setState({ ...state, confirmed: false, deleted: false })
-          }
-        >
-          Resetear estado
-        </button>
+        <button onClick={() => onReset()}>Resetear estado</button>
       </div>
     );
   }
