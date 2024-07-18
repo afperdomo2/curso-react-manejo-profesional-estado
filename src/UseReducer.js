@@ -3,14 +3,34 @@ import React from "react";
 const SECURITY_CODE = "paradigma";
 
 function UseReducer({ name }) {
+  // Definición de las acciones que se pueden realizar sobre el estado.
+  const actionType = {
+    ERROR: "error",
+    CHECK: "check",
+    CONFIRM: "confirm",
+    DELETE: "delete",
+    RESET: "reset",
+    WRITE: "write",
+  };
+
   // Función que devuelve un objeto con diferentes acciones para modificar el estado.
   const reducerObject = (state, payload) => ({
-    error: { ...state, error: true, loading: false },
-    check: { ...state, loading: true },
-    confirm: { ...state, error: false, loading: false, confirmed: true },
-    delete: { ...state, deleted: true },
-    reset: { ...state, confirmed: false, deleted: false, value: "" },
-    write: { ...state, value: payload },
+    [actionType.ERROR]: { ...state, error: true, loading: false },
+    [actionType.CHECK]: { ...state, loading: true },
+    [actionType.CONFIRM]: {
+      ...state,
+      error: false,
+      loading: false,
+      confirmed: true,
+    },
+    [actionType.DELETE]: { ...state, deleted: true },
+    [actionType.RESET]: {
+      ...state,
+      confirmed: false,
+      deleted: false,
+      value: "",
+    },
+    [actionType.WRITE]: { ...state, value: payload },
   });
 
   // Función reductora que actualiza el estado de la aplicación en función de la acción recibida.
@@ -28,13 +48,24 @@ function UseReducer({ name }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
+  // Actions creators
+  const onConfirm = () => dispatch({ type: actionType.CONFIRM });
+  const onError = () => dispatch({ type: actionType.ERROR });
+  const onCheck = () => dispatch({ type: actionType.CHECK });
+  const onDelete = () => dispatch({ type: actionType.DELETE });
+  const onReset = () => dispatch({ type: actionType.RESET });
+
+  const onWrite = ({ target: { value } }) => {
+    dispatch({ type: actionType.WRITE, payload: value });
+  };
+
   React.useEffect(() => {
     if (state.loading) {
       setTimeout(() => {
         if (state.value === SECURITY_CODE) {
-          dispatch({ type: "confirm" });
+          onConfirm();
         } else {
-          dispatch({ type: "error" });
+          onError();
         }
       }, 500);
     }
@@ -62,10 +93,10 @@ function UseReducer({ name }) {
           type="text"
           placeholder="Código de seguridad"
           value={state.value}
-          onChange={(e) => dispatch({ type: "write", payload: e.target.value })}
+          onChange={onWrite}
         />
 
-        <button onClick={() => dispatch({ type: "check" })}>Comprobar</button>
+        <button onClick={onCheck}>Comprobar</button>
       </div>
     );
   } else if (state.confirmed && !state.deleted) {
@@ -74,10 +105,8 @@ function UseReducer({ name }) {
         <h2>Eliminar {name}</h2>
         <p>¿Estás seguro que deseas eliminar el estado?</p>
         <div>
-          <button onClick={() => dispatch({ type: "delete" })}>
-            Si, eliminar
-          </button>
-          <button onClick={() => dispatch({ type: "reset" })}>Cancelar</button>
+          <button onClick={onDelete}>Si, eliminar</button>
+          <button onClick={onReset}>Cancelar</button>
         </div>
       </div>
     );
@@ -85,9 +114,7 @@ function UseReducer({ name }) {
     return (
       <div>
         <h2>Estado eliminado correctamente</h2>
-        <button onClick={() => dispatch({ type: "reset" })}>
-          Resetear estado
-        </button>
+        <button onClick={onReset}>Resetear estado</button>
       </div>
     );
   }
